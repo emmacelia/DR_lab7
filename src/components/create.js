@@ -1,45 +1,59 @@
 import React from "react";
-
+import axios from "axios";
 export class Create extends React.Component {
 
-    constructor(){
+    //super constructor
+    constructor() {
         super();
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onChangeBookTitle = this.onChangeBookTitle.bind(this);
         this.onChangeBookCover = this.onChangeBookCover.bind(this);
         this.onChangeBookAuthor = this.onChangeBookAuthor.bind(this);
         this.state = {
-            title:'',
-            cover:'',
-            author:''
+            title: '',
+            cover: '',
+            author: ''
         }
     }
-    handleSubmit(e){
+    //handles the button click 
+    handleSubmit(e) {
         e.preventDefault();
         console.log(`Button clicked 
         ${this.state.title},
         ${this.state.cover},
         ${this.state.author}`);
+
+        //variable to store the book information 
+        const BookInfo = {
+            title: this.state.title,
+            cover: this.state.cover,
+            author: this.state.author
+
+        }
+
+        //using axious to connect to 4000
+        axios.post("http://localhost:4000/api/books", BookInfo)
+
         this.setState({
-            title:'',
-            cover:'',
-            author:''
+            title: '',
+            cover: '',
+            author: ''
         })
     }
 
-    onChangeBookTitle(e){
+    onChangeBookTitle(e) {
         this.setState({
-            title:e.target.value
+            title: e.target.value
         })
     }
-    onChangeBookCover(e){
+    onChangeBookCover(e) {
         this.setState({
-            cover:e.target.value
+            cover: e.target.value
         })
     }
-    onChangeBookAuthor(e){
+    onChangeBookAuthor(e) {
         this.setState({
-            author:e.target.value
+            author: e.target.value
         })
     }
 
