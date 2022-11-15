@@ -6,6 +6,27 @@ const bodyParser = require('body-parser')
 //using cors to be able to connect to the page correctly
 const cors = require('cors');
 
+// getting-started.js
+const mongoose = require('mongoose');
+
+main().catch(err => console.log(err));
+
+//main method to collect to the database
+async function main() {
+    //connects to online database 
+    await mongoose.connect('mongodb+srv://admin:admin@cluster0.rpvx1ef.mongodb.net/?retryWrites=true&w=majority');
+
+}
+//creates the books schema to store the books 
+const bookSchema = new mongoose.Schema({
+    title: String,
+    cover: String,
+    author: String
+});
+
+//generate model for schema to interact with database 
+const bookModel = mongoose.model('books', bookSchema);
+
 app.use(cors());
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -24,7 +45,12 @@ app.use(bodyParser.json())
 
 //listens for the post request 
 app.post('/api/books', (req, res) => {
-    console.log(req.body);
+    //creates a record in the database that it is equal to the request 
+    bookModel.create({
+        title: req.body.title,
+        cover: req.body.cover,
+        author: req.body.author
+    })
     res.send("Data recieved");
 })
 
@@ -62,54 +88,21 @@ app.post('/name', (req, res) => {
 //accessing and display book array
 app.get('/api/books', (req, res) => {
 
-    const mybooks = [
-        {
-            "title": "Learn Git in a Month of Lunches",
-            "isbn": "1617292419",
-            "pageCount": 0,
-            "thumbnailUrl":
-                "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/umali.jpg",
-            "status": "MEAP",
-            "authors": ["Rick Umali"],
-            "categories": []
-        },
-        {
-            "title": "MongoDB in Action, Second Edition",
-            "isbn": "1617291609",
-            "pageCount": 0,
-            "thumbnailUrl":
-                "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/banker2.jpg",
-            "status": "MEAP",
-            "authors": [
-                "Kyle Banker",
-                "Peter Bakkum",
-                "Tim Hawkins",
-                "Shaun Verch",
-                "Douglas Garrett"
-            ],
-            "categories": []
-        },
-        {
-            "title": "Getting MEAN with Mongo, Express, Angular, and Node",
-            "isbn": "1617292036",
-            "pageCount": 0,
-            "thumbnailUrl":
-                "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/sholmes.jpg",
-            "status": "MEAP",
-            "authors": ["Simon Holmes"],
-            "categories": []
-        }
-
-    ]
-
-    //referencing the array
-    res.json({
-        books: mybooks
+    bookModel.find((error, data) => {
+        res.json(data);
     })
 
 
 })
+//allow us to search by ID
+app.get('/api/books/:id', (req, res) => {
 
+    console.log(req.params.id);
+    bookModel.findById(req.params.id, (error, data) => {
+        res.json(data);
+    })
+}
+)
 //writes to the console
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
